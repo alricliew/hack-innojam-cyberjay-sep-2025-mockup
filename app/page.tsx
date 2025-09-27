@@ -248,34 +248,6 @@ export default function Home() {
         </div>
 
 
-        {/* Find pet groomer in kl for RM50/hr. I am near bukit jalil */}
-        <div className="container mx-auto px-8 py-12 md:py-18">
-          {jobResult && Object.keys(jobResult).length > 0 ? (
-            <>
-              <h1 className="text-4xl font-bold text-center my-8">
-                On-Demand Workers
-              </h1>
-              <WorkerCard jobResult={jobResult as any} />
-            </>
-          ) : (
-            <p className="text-gray-600 text-center">No results yet.</p>
-          )}
-        </div>
-        <div className="container mx-auto px-8 py-12 md:py-18">
-          {jobResult && Array.isArray(jobResult?.local_business ) && jobResult?.local_business.length> 0 && 
-            <BusinessCard businesses={Array.isArray(jobResult?.local_business ) ? jobResult.local_business : []} />
-          }
-         
-          {/* {
-            jobResult && jobResult?.local_business && (jobResult?.local_business.map((biz, index) => (
-              
-            ))
-          } */}
-
-        </div>
-  
-
-
         {/* Step 2 */}
         <div className="max-w-md mx-auto mt-10 space-y-4">
           {isLoading && steps.map((step, index) => (
@@ -305,7 +277,36 @@ export default function Home() {
             </div>
           )}
         </div>
-        
+
+        {/* Find pet groomer in kl for RM50/hr. I am near bukit jalil */}
+        <div className="container mx-auto px-8 py-12 md:py-18">
+          {jobResult && Object.keys(jobResult).length > 0 ? (
+            <>
+              <h1 className="text-4xl font-bold text-center my-8">
+                On-Demand Workers
+              </h1>
+              <WorkerCard jobResult={jobResult as any} />
+            </>
+          ) : (
+            <p className="text-gray-600 text-center">No results yet.</p>
+          )}
+        </div>
+        <div className="container mx-auto px-8 py-12 md:py-18">
+          {jobResult && Array.isArray(jobResult?.local_business ) && jobResult?.local_business.length> 0 && 
+            <BusinessCard businesses={Array.isArray(jobResult?.local_business ) ? jobResult.local_business : []} />
+          }
+         
+          {/* {
+            jobResult && jobResult?.local_business && (jobResult?.local_business.map((biz, index) => (
+              
+            ))
+          } */}
+
+        </div>
+  
+
+
+    
           <div>
           { history && history.length > 0 && (<h2> <strong>History</strong></h2>)}
           

@@ -12,7 +12,7 @@ const workers: WorkerType[] = [
   { image: "/user/629.jpg", name: "Arif H.", skills: ["logistic", "helper"], location: "kl", },
   { image: "/user/IMG_5471.jpg", name: "Siti A.", skills: ["grocery", "helper"], location: "shah_alam" },
   { image: "/user/close-up-portrait-businesswoman-asian-female-entrepreneur-suit-smiling-looking-professional-standing-against-white-background.jpg", name: "Kumar R.", skills: ["logistic", "grocery"], location: "petaling_jaya" },
-  { image: "/user/IMG_5474.jpg", name: "Nurul F.", skills: ["helper", "grocery"], location: "cyberjaya" },
+  { image: "/user/IMG_5491.jpg", name: "Nurul F.", skills: ["helper", "grocery"], location: "cyberjaya" },
   { image: "/user/IMG_5477.jpg", name: "Daniel L.", skills: ["logistic", "helper"], location: "kl" },
   { image: "/user/IMG_5478.jpg", name: "Hafiz R.", skills: ["grocery", "helper"], location: "shah_alam" },
   { image: "/user/IMG_5480.jpg", name: "Mei Y.", skills: ["logistic", "grocery"], location: "kl" },
