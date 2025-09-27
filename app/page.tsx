@@ -21,7 +21,7 @@ import { WorkerCard } from "@/components/WorkerCard"
 import Lottie from "lottie-react";
 
 import animationData from '../public/TeacherSearch-GoLearn.json';
-
+import Spinner from '@/components/Spinner';
 const words = ['Send', 'Collect', 'Do Something'];
 
 const firebaseConfig = {
@@ -213,8 +213,19 @@ export default function Home() {
                 />
               </div> 
 
-              <Button variant="default" className="rounded-full shadow-lg hover:brightness-110 text-sm md:text-base px-6 py-3 my-2" >
-                Book Now
+              <Button variant="default" className={`rounded-full 
+              shadow-lg hover:brightness-110 text-sm md:text-base px-6 py-3 my-2 
+                ${isLoading ? 'cursor-not-allowed brightness-90' : ''}`
+                } 
+              >
+                 {isLoading ? (
+                  <>
+                    <Spinner />
+                    <span className="ml-3">Loading...</span>
+                  </>
+                ) : (
+                  'Find Now'
+                )}
               </Button>
               {/* <Button className="inline-flex items-center rounded-full bg-[hsl(var(--primary))] px-6 py-3 text-sm md:text-base font-bold shadow-lg hover:brightness-110">Book Now</Button> */}
             </form>
