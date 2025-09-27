@@ -15,8 +15,12 @@ import {auth} from "@/lib/firebase"
 import { set } from "zod"
 
 import {BusinessCard, BusinessType } from "@/components/businessCard"
+import { WorkerCard } from "@/components/WorkerCard"
 
+// import { Player } from 'lottie-react';
+import Lottie from "lottie-react";
 
+import animationData from '../public/TeacherSearch-GoLearn.json';
 
 const words = ['Send', 'Collect', 'Do Something'];
 
@@ -52,6 +56,7 @@ export default function Home() {
   const [completeStep1, setCompleteStep1] = useState<boolean>(false); 
 
   interface JobResult {
+
     local_business?: any[];
     // add other properties if needed
   }
@@ -166,40 +171,86 @@ export default function Home() {
   return (
   
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20">
-      
+        {/* Hero */}
+      <section id="rates" className="bg-gradient-to-b from-[hsl(211_100%_98%)] to-white">
+ 
+      </section>
       <main className="container flex flex-col gap-[32px] row-start-2 items-center sm:items-star justify-center">
-       
-        <div className="flex items-center space-x-2 text-2xl font-semibold">
-          <span>I want to</span>
-          <div className="h-[2.5rem] overflow-hidden relative w-[15rem]">
-            <div
-              className="absolute transition-transform duration-500 ease-in-out"
-              style={{ transform: `translateY(-${index * 2.5}rem)` }}
-            >
-              {words.map((word, idx) => (
-                <div key={idx} className="h-[2.5rem] flex items-center">
-                  {word}
+       <div className="container mx-auto px-8 py-12 md:py-18">
+          <div className="grid items-center gap-10 md:grid-cols-2">
+            <div>
+              <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-[hsl(var(--primary))]">
+                Run for you 24/7
+              </h1>
+              <p className="mt-4 max-w-xl text-neutral-700 text-base md:text-lg">
+                Non stop
+              </p>
+              <div className="mt-6 flex flex-wrap gap-2">
+                <div className="flex items-center space-x-2 text-2xl font-semibold">
+                  <span>I want to</span>
+                  <div className="h-[2.5rem] overflow-hidden relative w-[15rem]">
+                    <div
+                      className="absolute transition-transform duration-500 ease-in-out"
+                      style={{ transform: `translateY(-${index * 2.5}rem)` }}
+                    >
+                      {words.map((word, idx) => (
+                        <div key={idx} className="h-[2.5rem] flex items-center">
+                          {word}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              ))}
+              </div>
+            <form className="relative w-full max-w-md" action={handleFormSubmit}>
+              <div className="relative w-full max-w-md">
+                <Input
+                  type="text"
+                  placeholder="Type something..."
+                  className="w-full px-4 py-3 text-lg rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
+                  value={inputValue}
+                  onChange={(e)=> handleChange(e)}
+                />
+              </div> 
+
+              <Button variant="default" className="rounded-full shadow-lg hover:brightness-110 text-sm md:text-base px-6 py-3 my-2" >
+                Book Now
+              </Button>
+              {/* <Button className="inline-flex items-center rounded-full bg-[hsl(var(--primary))] px-6 py-3 text-sm md:text-base font-bold shadow-lg hover:brightness-110">Book Now</Button> */}
+            </form>
+
+              {/* <p className="mt-3 text-xs text-neutral-500">More note</p> */}
+            </div>
+            <div className="relative">
+              {/* <div className="mx-auto aspect-[4/3] w-full max-w-md rounded-3xl bg-gradient-to-br from-[hsl(var(--primary))] to-[hsl(var(--primary-dark))] shadow-[0_40px_120px_-40px_hsl(211_100%_30%_/_0.4)]" > */}
+              <Lottie animationData={animationData} loop={true} className="mx-auto aspect-[4/3] w-full max-w-md rounded-3xl bg-gradient-to-br from-[hsl(var(--primary))] to-[hsl(var(--primary-dark))] shadow-[0_40px_120px_-40px_hsl(211_100%_30%_/_0.4)]"/>
+              {/* <Player
+                autoplay
+                loop
+                src={animationData}
+                style={{ height: '100%', width: '100%' }}
+              /> */}
+              {/* <Player autoplay loop src="https://assets7.lottiefiles.com/packages/lf20_x62chJ.json" /> */}
+              {/* </div> */}
             </div>
           </div>
         </div>
-        <form className="relative w-full max-w-md" action={handleFormSubmit}>
-          <div className="relative w-full max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              type="text"
-              placeholder="Type something..."
-              className="pl-10"
-              value={inputValue}
-              onChange={(e)=> handleChange(e)}
-            />
-          </div> 
-          <Button variant="outline">Book Now</Button>
-        </form>
+
+
         {/* Find pet groomer in kl for RM50/hr. I am near bukit jalil */}
- 
-        <div>
+        <div className="container mx-auto px-8 py-12 md:py-18">
+          {jobResult && Object.keys(jobResult).length > 0 ? (
+            <>
+              <h1 className="text-4xl font-bold text-center my-8">
+                On-Demand Workers
+              </h1>
+              <WorkerCard jobResult={jobResult as any} />
+            </>
+          ) : (
+            <p className="text-gray-600 text-center">No results yet.</p>
+          )}
+        </div>
+        <div className="container mx-auto px-8 py-12 md:py-18">
           {jobResult && Array.isArray(jobResult?.local_business ) && jobResult?.local_business.length> 0 && 
             <BusinessCard businesses={Array.isArray(jobResult?.local_business ) ? jobResult.local_business : []} />
           }

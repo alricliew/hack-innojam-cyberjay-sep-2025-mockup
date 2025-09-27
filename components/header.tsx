@@ -31,7 +31,7 @@ export default function Header() {
             />
             <Label htmlFor="mode">Provider Mode</Label>
             <Link href="/auth">
-              <Button variant="default" >
+              <Button variant="default" className="rounded-full" >
                 Login
               </Button>
             </Link>
