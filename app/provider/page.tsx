@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react"
 import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { runFlow, streamFlow } from '@genkit-ai/next/client';
 import { jobFlow, menuSuggestionFlow } from '@/lib/genkit';
@@ -149,8 +150,9 @@ export default function Home() {
               </div>
             <form className="relative w-full max-w-md" action={handleFormSubmit}>
               <div className="relative w-full max-w-md">
-                <Input
-                  type="text"
+                <Textarea 
+                  // type="text"
+                  rows={3}
                   placeholder="Type something..."
                   className="pl-10"
                 />

@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
 import { runFlow, streamFlow } from '@genkit-ai/next/client';
 import { jobFlow, menuSuggestionFlow } from '@/lib/genkit';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -68,7 +69,7 @@ export default function Home() {
     target: { value: string };
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement> & InputChangeEvent): void => {
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement> & InputChangeEvent): void => {
     setInputValue(e.target.value); // update state with input value
   }
   async function handleFormSubmit(formData: FormData) {
@@ -204,8 +205,9 @@ export default function Home() {
               </div>
             <form className="relative w-full max-w-md" action={handleFormSubmit}>
               <div className="relative w-full max-w-md">
-                <Input
-                  type="text"
+                <Textarea 
+                  // type="text"
+                  rows={3}
                   placeholder="Type something..."
                   className="w-full px-4 py-3 text-lg rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
                   value={inputValue}
