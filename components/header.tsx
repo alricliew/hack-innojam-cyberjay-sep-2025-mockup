@@ -23,16 +23,16 @@ export default function Header() {
         {/* Right side: Switch + Login button */}
         <div className="flex items-center space-x-4">
             
-            <Switch
+            {/* <Switch
               color=""
               checked={isChecked}
               onCheckedChange={setIsChecked}
 
-            />
-            <Label htmlFor="mode">Provider Mode</Label>
+            /> */}
+            {/* <Label htmlFor="mode">Provider Mode</Label> */}
             <Link href="/auth">
               <Button variant="default" className="rounded-full" >
-                Login
+                Logout
               </Button>
             </Link>
 

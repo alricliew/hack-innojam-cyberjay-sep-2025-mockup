@@ -118,11 +118,58 @@ export default function Home() {
   
   return (
   
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20">
+    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center p-8 pb-20 sm:p-20">
       
       <main className="container flex flex-col gap-[32px] row-start-2 items-center sm:items-star justify-center">
-       
-        <div className="flex items-center space-x-2 text-2xl font-semibold">
+        <div className="container mx-auto px-8 py-12 md:py-18">
+          <div className="grid items-center gap-10 md:grid-cols-2">
+            <div>
+              <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-[hsl(var(--primary))]">
+                Run & Earn 24/7
+              </h1>
+              <p className="mt-4 max-w-xl text-neutral-700 text-base md:text-lg">
+                Monetize your skills!
+              </p>
+              <div className="mt-6 flex flex-wrap gap-2">
+                <div className="flex items-center space-x-2 text-2xl font-semibold">
+                  <span className="w-[7rem]">I want to</span>
+                  <div className="h-[2.5rem] overflow-hidden relative w-[15rem]">
+                    <div
+                      className="absolute transition-transform duration-500 ease-in-out"
+                      style={{ transform: `translateY(-${index * 2.5}rem)` }}
+                    >
+                      {words.map((word, idx) => (
+                        <div key={idx} className="h-[2.5rem] flex items-center">
+                          {word}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <form className="relative w-full max-w-md" action={handleFormSubmit}>
+              <div className="relative w-full max-w-md">
+                <Input
+                  type="text"
+                  placeholder="Type something..."
+                  className="pl-10"
+                />
+              </div> 
+
+              <Button variant="default" className="rounded-full shadow-lg hover:brightness-110 text-sm md:text-base px-6 py-3 my-2" >
+                Search Now
+              </Button>
+              {/* <Button className="inline-flex items-center rounded-full bg-[hsl(var(--primary))] px-6 py-3 text-sm md:text-base font-bold shadow-lg hover:brightness-110">Book Now</Button> */}
+            </form>
+
+              {/* <p className="mt-3 text-xs text-neutral-500">More note</p> */}
+            </div>
+            {/* <div className="relative">
+              <Lottie animationData={animationData} loop={true} className="mx-auto aspect-[4/3] w-full max-w-md rounded-3xl bg-gradient-to-br from-[hsl(var(--primary))] to-[hsl(var(--primary-dark))] shadow-[0_40px_120px_-40px_hsl(211_100%_30%_/_0.4)]"/>
+            </div> */}
+          </div>
+        </div>
+        {/* <div className="flex items-center space-x-2 text-2xl font-semibold">
           <span>Hi Runner! </span>
           <div className="h-[2.5rem] overflow-hidden relative w-[15rem]">
             <div
@@ -136,8 +183,9 @@ export default function Home() {
               ))}
             </div>
           </div>
-        </div>
-        <form className="relative w-full max-w-md" action={handleFormSubmit}>
+        </div> */}
+
+        {/* <form className="relative w-full max-w-md" action={handleFormSubmit}>
           <div className="relative w-full max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
@@ -147,7 +195,7 @@ export default function Home() {
             />
           </div> 
           <Button variant="outline">Book Now</Button>
-        </form>
+        </form> */}
 
       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {jobs.map(job => (

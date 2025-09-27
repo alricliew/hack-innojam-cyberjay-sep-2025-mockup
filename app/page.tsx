@@ -187,7 +187,7 @@ export default function Home() {
               </p>
               <div className="mt-6 flex flex-wrap gap-2">
                 <div className="flex items-center space-x-2 text-2xl font-semibold">
-                  <span>I want to</span>
+                  <span  className="w-[7rem]">I want to</span>
                   <div className="h-[2.5rem] overflow-hidden relative w-[15rem]">
                     <div
                       className="absolute transition-transform duration-500 ease-in-out"
