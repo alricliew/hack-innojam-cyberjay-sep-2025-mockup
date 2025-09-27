@@ -93,8 +93,10 @@ export default function Home() {
 
 
   // User
-   const [jobs, setJobs] = useState<any[]>([]);
+ const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedJob, setSelectedJob] = useState<any>(null); // State for the selected job
+  const [offerPrice, setOfferPrice] = useState<string>(""); // State for the user's offer price
 
   useEffect(() => {
     const jobsCollection = collection(db, 'job');
@@ -117,6 +119,27 @@ export default function Home() {
   }, []);
 
   
+  const handleApplyNow = (job: any) => {
+    setSelectedJob(job); // Set the selected job for the modal
+    setOfferPrice(""); // Reset the offer price
+  };
+
+  const handleSubmitOffer = () => {
+    if (!offerPrice || isNaN(Number(offerPrice))) {
+      alert("Please enter a valid price.");
+      return;
+    }
+
+    // Simulate sending the offer (replace this with an API call if needed)
+    console.log("Submitting offer:", {
+      job: selectedJob,
+      offerPrice,
+    });
+
+    alert(`Offer of RM ${offerPrice} submitted for the job: ${selectedJob.task}`);
+    setSelectedJob(null); // Close the modal after submission
+  };
+
   return (
   
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center p-8 pb-20 sm:p-20">
@@ -200,44 +223,115 @@ export default function Home() {
         </form> */}
 
       <ul className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        {jobs.map(job => (
-          <li key={job.id} className="bg-white shadow-md rounded-lg p-6 hover:shadow-xl transition-shadow duration-300">
-            <h3 className="text-xl font-bold text-indigo-600 mb-2">{job.task || "Untitled Job"}</h3>
+          {jobs.map((job) => (
+            <li
+              key={job.id}
+              className="bg-white shadow-md rounded-lg p-6 hover:shadow-xl transition-shadow duration-300"
+            >
+              <h3 className="text-xl font-bold text-indigo-600 mb-2">
+                {job.task || "Untitled Job"}
+              </h3>
 
-            <div className="space-y-2 text-gray-700 text-sm">
-              {job.price !== undefined && (
-                <div>
-                  <strong>Price:</strong> RM {job.price || "TBD"}
-                </div>
-              )}
-              {job.recommendedPrice !== undefined && (
-                <div>
-                  <strong>Recommended Price:</strong> RM {job.recommendedPrice}
-                </div>
-              )}
-              {job.location && (
-                <div>
-                  <strong>Location:</strong> {job.location}
-                </div>
-              )}
-              {job.urgency && (
-                <div>
-                  <strong>Urgency:</strong> <span className={`font-semibold ${
-                    job.urgency.toLowerCase() === 'high' ? 'text-red-600' :
-                    job.urgency.toLowerCase() === 'medium' ? 'text-yellow-600' :
-                    'text-green-600'
-                  }`}>{job.urgency}</span>
-                </div>
-              )}
-            </div>
-            <Button>Apply Now</Button>
-          </li>
-        ))}
-      </ul>        
+              <div className="space-y-2 text-gray-700 text-sm">
+                {job.price !== undefined && (
+                  <div>
+                    <strong>Price:</strong> {job.price || "TBD"}
+                  </div>
+                )}
+                {job.recommendedPrice !== undefined && (
+                  <div>
+                    <strong>Recommended Price:</strong> RM {job.recommendedPrice}
+                  </div>
+                )}
+                {job.location && (
+                  <div>
+                    <strong>Location:</strong> {job.location}
+                  </div>
+                )}
+                {job.urgency && (
+                  <div>
+                    <strong>Urgency:</strong>{" "}
+                    <span
+                      className={`font-semibold ${
+                        job.urgency.toLowerCase() === "high"
+                          ? "text-red-600"
+                          : job.urgency.toLowerCase() === "medium"
+                          ? "text-yellow-600"
+                          : "text-green-600"
+                      }`}
+                    >
+                      {job.urgency}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <Button onClick={() => handleApplyNow(job)}>Apply Now</Button>
+            </li>
+          ))}
+        </ul>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
 
-      </footer>
+      {/* Modal for Job Details */}
+      {selectedJob && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <h3 className="text-2xl font-bold mb-4">{selectedJob.task}</h3>
+            <p className="text-gray-600 text-sm mb-2">
+              <strong>Price:</strong> {selectedJob.price || "TBD"}
+            </p>
+            <p className="text-gray-600 text-sm mb-2">
+              <strong>Recommended Price:</strong>{" "}
+              {selectedJob.recommended_price || "N/A"}
+            </p>
+            <p className="text-gray-600 text-sm mb-2">
+              <strong>Location:</strong> {selectedJob.location}
+            </p>
+            <p className="text-gray-600 text-sm mb-2">
+              <strong>Urgency:</strong>{" "}
+              <span
+                className={`font-semibold ${
+                  selectedJob.urgency?.toLowerCase() === "high"
+                    ? "text-red-600"
+                    : selectedJob.urgency?.toLowerCase() === "medium"
+                    ? "text-yellow-600"
+                    : "text-green-600"
+                }`}
+              >
+                {selectedJob.urgency}
+              </span>
+            </p>
+
+            {/* User Offer Price Input */}
+            <div className="mt-4">
+              <label className="block text-gray-700 text-sm font-medium mb-2">
+                Offer a Better Price:
+              </label>
+              <Input
+                type="number"
+                value={offerPrice}
+                onChange={(e) => setOfferPrice(e.target.value)}
+                placeholder="Enter your price"
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div className="flex justify-end mt-4">
+              <Button
+                className="mr-2 bg-green-500 hover:bg-green-600 text-white"
+                onClick={handleSubmitOffer}
+              >
+                Submit Offer
+              </Button>
+              <Button
+                className="bg-gray-500 hover:bg-gray-600 text-white"
+                onClick={() => setSelectedJob(null)}
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
