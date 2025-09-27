@@ -33,7 +33,7 @@ export const jobFlow = ai.defineFlow(
   {
     name: 'jobFlow',
     inputSchema: z.object({ theme: z.string() }),
-    outputSchema: z.object({ jobResult: z.string() }),
+    outputSchema: z.object({ jobResult: z.any() }),
     streamSchema: z.string(),
   },
   async ({ theme }, { sendChunk }) => {
@@ -48,7 +48,7 @@ export const jobFlow = ai.defineFlow(
         recommended_price: Recommended price
         urgency: [ASAP, urgent, schedule, TODAY]}
         datetime: Date time
-        local_business: List up to 5 businesses of the same type near me
+        local_business: List up to 5 businesses of the same type near me with name, photo, url and review in stars
       `,
     });
 
@@ -57,6 +57,23 @@ export const jobFlow = ai.defineFlow(
     }
 
     const { text } = await response;
+    console.log("result:,", text)
+    const cleanJSON = text
+      .replace(/^```json/, '') // remove starting ```json
+      .replace(/^```/, '')     // fallback if just ```
+      .replace(/```$/, '')     // remove ending ```
+      .trim();
+    console.log("cleanJSON:,", cleanJSON)
+
+    try {
+      const parsed = JSON.parse(cleanJSON);
+      return { jobResult: parsed };
+
+    } catch (err) {
+      console.error('Failed to parse AI response as JSON:', cleanJSON);
+      throw new Error('Invalid JSON returned by the model');
+    }
+
     return { jobResult: text };
   }
 );

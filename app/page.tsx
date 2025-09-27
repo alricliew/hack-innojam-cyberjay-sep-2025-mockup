@@ -10,13 +10,14 @@ import { Loader2, CheckCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 import {auth} from "@/lib/firebase"
+import { set } from "zod"
+
+import {BusinessCard, BusinessType } from "@/components/businessCard"
+
+
+
 const words = ['Send', 'Collect', 'Do Something'];
 
-const steps = [
-  "Summarize request using GenAI to analyse the request..",
-  "Assigning resource to your account...",
-  "Finalizing...",
-]
 export default function Home() {
 
   onAuthStateChanged(auth, (user) => {
@@ -35,7 +36,11 @@ export default function Home() {
   const [history, setHistory] = useState<string[]>([]); // initialize with empty array of strings
   const [completeStep1, setCompleteStep1] = useState<boolean>(false); 
 
-  const [menuItem, setMenuItem] = useState<string>('');
+  interface JobResult {
+    local_business?: any[];
+    // add other properties if needed
+  }
+  const [jobResult, setJobResult] = useState<JobResult>({});
   const [isLoading, setIsLoading] = useState(false);
   const [streamedText, setStreamedText] = useState<string>('');
 
@@ -54,10 +59,8 @@ export default function Home() {
     // const theme = formData.get('theme')?.toString() ?? '';
     setIsLoading(true);
 
-
     if (inputValue.trim() !== '') {
       setHistory(prevHistory => [...prevHistory, inputValue]); // push to history
-      setInputValue(''); // clear input
     }
       console.log("theme:", inputValue)
 
@@ -74,46 +77,14 @@ export default function Home() {
         input: { theme: inputValue },
       });
 
-      setMenuItem(result.jobResult);
+      setJobResult(result.jobResult);
     } catch (error) {
       console.error('Error generating menu item:', error);
     } finally {
       setIsLoading(false);
     }
   }
-  async function streamMenuItem(formData: FormData) {
-    const user = auth.currentUser
-    const idToken = await user?.getIdToken();
-    console.log("idToken:", idToken)
-    const theme = formData.get('theme')?.toString() ?? '';
-    setIsLoading(true);
-    setStreamedText('');
 
-    try {
-      // Streaming approach
-      const result = streamFlow<typeof menuSuggestionFlow>({
-        url: '/api/menuSuggestion',
-        headers: {
-          'Authorization': `Bearer ${idToken}`,
-          'Content-Type': 'application/json',
-        },
-        input: { theme },
-      });
-
-      // Process the stream chunks as they arrive
-      for await (const chunk of result.stream) {
-        setStreamedText((prev) => prev + chunk);
-      }
-
-      // Get the final complete response
-      const finalOutput = await result.output;
-      setMenuItem(finalOutput.menuItem);
-    } catch (error) {
-      console.error('Error streaming menu item:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }
   const [index, setIndex] = useState(0);
   useEffect(() => {
     const interval = setInterval(() => {
@@ -123,35 +94,50 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
+  
   // Step 2: Step process 
+  const steps = [
+  "Summarize request using GenAI to analyse the request..",
+  "Matching...",
+  "Finalizing...",
+]
+
   const [currentStep, setCurrentStep] = useState<number>(0)
   const [completed, setCompleted] = useState<boolean>(false)
   const [loading, setLoading] = useState(false); // optional: show loading state
 
   useEffect(() => {
-    const runInstallationSteps = async () => {
-      for (let i = 0; i < steps.length; i++) {
+    if (isLoading){
+      const runInstallationSteps = async () => {
+        for (let i = 0; i < steps.length; i++) {
+          
+          if (i = 0) {
+            while(!completeStep1) {
         
-        if (i = 0) {
-          // while(!completeStep1) {
-          //   await
-          // }
-        }else {
-          await simulateStep(i)
+            }
+          }else {
+            await simulateStep(i)
+          }
+          setCurrentStep(i + 1)
         }
-        setCurrentStep(i + 1)
+        setCompleted(true)
       }
-      setCompleted(true)
+
+      runInstallationSteps()
     }
 
-    runInstallationSteps()
-  }, [])
+  }, [isLoading])
 
   const simulateStep = (step: number) => {
     // Simulate async work: replace this with real API logic
     return new Promise((resolve) => {
       setTimeout(resolve, 2000) // 2 seconds per step
     })
+  }
+
+  const handlePaste = (input: string) => {
+    console.log(input)
+    setInputValue(input)
   }
 
   return (
@@ -182,28 +168,32 @@ export default function Home() {
               type="text"
               placeholder="Type something..."
               className="pl-10"
-
+              value={inputValue}
               onChange={(e)=> handleChange(e)}
             />
           </div> 
           <Button variant="outline">Book Now</Button>
         </form>
-
-        {
-          inputValue
-        }
-
+        {/* Find pet groomer in kl for RM50/hr. I am near bukit jalil */}
+ 
         <div>
-          <h2>History</h2>
-          {
-            history && history.map(i => (
-              <>i</>
-            ))
+          {jobResult && Array.isArray(jobResult?.local_business ) && jobResult?.local_business.length> 0 && 
+            <BusinessCard businesses={Array.isArray(jobResult?.local_business ) ? jobResult.local_business : []} />
           }
+         
+          {/* {
+            jobResult && jobResult?.local_business && (jobResult?.local_business.map((biz, index) => (
+              
+            ))
+          } */}
+
         </div>
+  
+
+
         {/* Step 2 */}
         <div className="max-w-md mx-auto mt-10 space-y-4">
-          {steps.map((step, index) => (
+          {isLoading && steps.map((step, index) => (
             <div key={index} className="flex items-center space-x-2 text-sm">
               {index < currentStep ? (
                 <CheckCircle className="text-green-500 h-4 w-4" />
@@ -231,6 +221,15 @@ export default function Home() {
           )}
         </div>
         
+          <div>
+          { history && history.length > 0 && (<h2> <strong>History</strong></h2>)}
+          
+          {
+            history && history.map((i,index) => (
+              <p key={index}>{i} <Button size={"sm"} variant="outline" onClick={() => handlePaste(i)}>Again</Button></p>
+            ))
+          }
+        </div>
         {/* Step 1: GenAI to generate response in 
         [
           {item: "Pet my dog", type: "help", fee:"45" feeType: "per day", currency: "MYR", depart: "", end: "", due: ""},
@@ -285,10 +284,10 @@ export default function Home() {
           </div>
         )}
 
-        {menuItem && (
+        {jobResult && (
           <div className="flex items-center">
             <h3>Final Output:</h3>
-            <p>{menuItem}</p>
+            <p>{JSON.stringify(jobResult)}</p>
           </div>
         )} 
 
