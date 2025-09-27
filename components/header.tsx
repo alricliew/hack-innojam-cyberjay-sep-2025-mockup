@@ -15,7 +15,7 @@ export default function Header() {
         {/* Logo on the left */}
         <Link href="/">
           <div className="text-xl font-bold">
-            LOGO
+            247Runner
           </div>
         </Link>
 

@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button"
 import { runFlow, streamFlow } from '@genkit-ai/next/client';
 import { jobFlow, menuSuggestionFlow } from '@/lib/genkit';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
+
 import { Loader2, CheckCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
+import { initializeApp } from 'firebase/app';
 import {auth} from "@/lib/firebase"
 import { set } from "zod"
 
@@ -17,6 +19,19 @@ import {BusinessCard, BusinessType } from "@/components/businessCard"
 
 
 const words = ['Send', 'Collect', 'Do Something'];
+
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 
 export default function Home() {
 
@@ -78,6 +93,14 @@ export default function Home() {
       });
 
       setJobResult(result.jobResult);
+      console.log(result.jobResult)
+      // Push to Firestore
+      const docRef = await addDoc(collection(db, 'job'), {
+        ...result.jobResult, // save all properties of result
+        createdAt: new Date(),
+      });
+
+      
     } catch (error) {
       console.error('Error generating menu item:', error);
     } finally {
@@ -286,7 +309,7 @@ export default function Home() {
 
         {jobResult && (
           <div className="flex items-center">
-            <h3>Final Output:</h3>
+            <h3>LLM Output:</h3>
             <p>{JSON.stringify(jobResult)}</p>
           </div>
         )} 

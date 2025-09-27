@@ -6,27 +6,13 @@ import { Button } from "@/components/ui/button"
 import { runFlow, streamFlow } from '@genkit-ai/next/client';
 import { jobFlow, menuSuggestionFlow } from '@/lib/genkit';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { initializeApp } from 'firebase/app';
-import { getFirestore, collection, onSnapshot, QuerySnapshot, DocumentData } from 'firebase/firestore';
-
-
 import { Loader2, CheckCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-};
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
 
 import {auth} from "@/lib/firebase"
-const words = ['Pet groomer', 'Painting', 'Send Surprice', "Babysitter", "Fix broken pipe", "Punctured tire", "Throw rubbish", "Send parcel"];
+const words = ['Send', 'Collect', 'Do Something'];
 
 const steps = [
   "Processing your request...",
@@ -80,7 +66,39 @@ export default function Home() {
       setIsLoading(false);
     }
   }
-  
+  async function streamMenuItem(formData: FormData) {
+    const user = auth.currentUser
+    const idToken = await user?.getIdToken();
+    console.log("idToken:", idToken)
+    const theme = formData.get('theme')?.toString() ?? '';
+    setIsLoading(true);
+    setStreamedText('');
+
+    try {
+      // Streaming approach
+      const result = streamFlow<typeof menuSuggestionFlow>({
+        url: '/api/menuSuggestion',
+        headers: {
+          'Authorization': `Bearer ${idToken}`,
+          'Content-Type': 'application/json',
+        },
+        input: { theme },
+      });
+
+      // Process the stream chunks as they arrive
+      for await (const chunk of result.stream) {
+        setStreamedText((prev) => prev + chunk);
+      }
+
+      // Get the final complete response
+      const finalOutput = await result.output;
+      setMenuItem(finalOutput.menuItem);
+    } catch (error) {
+      console.error('Error streaming menu item:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
   const [index, setIndex] = useState(0);
   useEffect(() => {
     const interval = setInterval(() => {
@@ -90,30 +108,30 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-
-  // User
-   const [jobs, setJobs] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Step 2: Step process 
+  const [currentStep, setCurrentStep] = useState<number>(0)
+  const [completed, setCompleted] = useState<boolean>(false)
 
   useEffect(() => {
-    const jobsCollection = collection(db, 'job');
+    const runInstallationSteps = async () => {
+      for (let i = 0; i < steps.length; i++) {
+        await simulateStep(i)
+        setCurrentStep(i + 1)
+      }
+      setCompleted(true)
+    }
 
-    // Listen for real-time updates
-    const unsubscribe = onSnapshot(jobsCollection, (snapshot: QuerySnapshot<DocumentData>) => {
-      const jobsData = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setJobs(jobsData);
-      setLoading(false);
-    }, (error) => {
-      console.error("Error fetching jobs: ", error);
-      setLoading(false);
-    });
+    runInstallationSteps()
+  }, [])
 
-    // Cleanup subscription on unmount
-    return () => unsubscribe();
-  }, []);
+  const simulateStep = (step: number) => {
+    // Simulate async work: replace this with real API logic
+    return new Promise((resolve) => {
+      setTimeout(resolve, 2000) // 2 seconds per step
+    })
+  }
+
+
 
   
   return (
@@ -123,7 +141,7 @@ export default function Home() {
       <main className="container flex flex-col gap-[32px] row-start-2 items-center sm:items-star justify-center">
        
         <div className="flex items-center space-x-2 text-2xl font-semibold">
-          <span>Hi Runner! </span>
+          <span>I want to</span>
           <div className="h-[2.5rem] overflow-hidden relative w-[15rem]">
             <div
               className="absolute transition-transform duration-500 ease-in-out"
@@ -149,41 +167,7 @@ export default function Home() {
           <Button variant="outline">Book Now</Button>
         </form>
 
-      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        {jobs.map(job => (
-          <li key={job.id} className="bg-white shadow-md rounded-lg p-6 hover:shadow-xl transition-shadow duration-300">
-            <h3 className="text-xl font-bold text-indigo-600 mb-2">{job.task || "Untitled Job"}</h3>
 
-            <div className="space-y-2 text-gray-700 text-sm">
-              {job.price !== undefined && (
-                <div>
-                  <strong>Price:</strong> RM {job.price || "TBD"}
-                </div>
-              )}
-              {job.recommendedPrice !== undefined && (
-                <div>
-                  <strong>Recommended Price:</strong> RM {job.recommendedPrice}
-                </div>
-              )}
-              {job.location && (
-                <div>
-                  <strong>Location:</strong> {job.location}
-                </div>
-              )}
-              {job.urgency && (
-                <div>
-                  <strong>Urgency:</strong> <span className={`font-semibold ${
-                    job.urgency.toLowerCase() === 'high' ? 'text-red-600' :
-                    job.urgency.toLowerCase() === 'medium' ? 'text-yellow-600' :
-                    'text-green-600'
-                  }`}>{job.urgency}</span>
-                </div>
-              )}
-            </div>
-            <Button>Apply Now</Button>
-          </li>
-        ))}
-      </ul>        
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
 
