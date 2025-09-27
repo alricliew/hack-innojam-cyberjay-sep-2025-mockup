@@ -4,7 +4,7 @@ import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { runFlow, streamFlow } from '@genkit-ai/next/client';
-import { menuSuggestionFlow } from '@/lib/genkit';
+import { jobFlow, menuSuggestionFlow } from '@/lib/genkit';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { Loader2, CheckCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -50,8 +50,8 @@ export default function Home() {
     try {
       // Regular (non-streaming) approach
       console.log("theme:", theme)
-      const result = await runFlow<typeof menuSuggestionFlow>({
-        url: '/api/menuSuggestion',
+      const result = await runFlow<typeof jobFlow>({
+        url: '/api/jobFlow',
         headers: {
           Authorization: `Bearer ${idToken}`,
           'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ export default function Home() {
         input: { theme },
       });
 
-      setMenuItem(result.menuItem);
+      setMenuItem(result.jobResult);
     } catch (error) {
       console.error('Error generating menu item:', error);
     } finally {

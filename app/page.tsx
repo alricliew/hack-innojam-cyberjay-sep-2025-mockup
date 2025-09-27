@@ -4,18 +4,16 @@ import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { runFlow, streamFlow } from '@genkit-ai/next/client';
-import { menuSuggestionFlow } from '@/lib/genkit';
+import { jobFlow, menuSuggestionFlow } from '@/lib/genkit';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { Loader2, CheckCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-
 
 import {auth} from "@/lib/firebase"
 const words = ['Send', 'Collect', 'Do Something'];
 
 const steps = [
-  "Processing your request...",
+  "Summarize request using GenAI to analyse the request..",
   "Assigning resource to your account...",
   "Finalizing...",
 ]
@@ -33,33 +31,50 @@ export default function Home() {
       // ...
     }
   });
+  const [inputValue, setInputValue] = useState<string>(""); // initialize with empty string
+  const [history, setHistory] = useState<string[]>([]); // initialize with empty array of strings
+  const [completeStep1, setCompleteStep1] = useState<boolean>(false); 
 
   const [menuItem, setMenuItem] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [streamedText, setStreamedText] = useState<string>('');
 
+  interface InputChangeEvent {
+    target: { value: string };
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement> & InputChangeEvent): void => {
+    setInputValue(e.target.value); // update state with input value
+  }
   async function handleFormSubmit(formData: FormData) {
     const user = auth.currentUser
     const idToken = await user?.getIdToken();
     console.log("idToken:", idToken)
-
-
-    const theme = formData.get('theme')?.toString() ?? '';
+  
+    // const theme = formData.get('theme')?.toString() ?? '';
     setIsLoading(true);
+
+
+    if (inputValue.trim() !== '') {
+      setHistory(prevHistory => [...prevHistory, inputValue]); // push to history
+      setInputValue(''); // clear input
+    }
+      console.log("theme:", inputValue)
+
 
     try {
       // Regular (non-streaming) approach
-      console.log("theme:", theme)
-      const result = await runFlow<typeof menuSuggestionFlow>({
-        url: '/api/menuSuggestion',
+      console.log("theme:", inputValue)
+      const result = await runFlow<typeof jobFlow>({
+        url: '/api/job',
         headers: {
           Authorization: `Bearer ${idToken}`,
           'Content-Type': 'application/json',
         },
-        input: { theme },
+        input: { theme: inputValue },
       });
 
-      setMenuItem(result.menuItem);
+      setMenuItem(result.jobResult);
     } catch (error) {
       console.error('Error generating menu item:', error);
     } finally {
@@ -111,11 +126,19 @@ export default function Home() {
   // Step 2: Step process 
   const [currentStep, setCurrentStep] = useState<number>(0)
   const [completed, setCompleted] = useState<boolean>(false)
+  const [loading, setLoading] = useState(false); // optional: show loading state
 
   useEffect(() => {
     const runInstallationSteps = async () => {
       for (let i = 0; i < steps.length; i++) {
-        await simulateStep(i)
+        
+        if (i = 0) {
+          // while(!completeStep1) {
+          //   await
+          // }
+        }else {
+          await simulateStep(i)
+        }
         setCurrentStep(i + 1)
       }
       setCompleted(true)
@@ -131,9 +154,6 @@ export default function Home() {
     })
   }
 
-
-
-  
   return (
   
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20">
@@ -162,11 +182,25 @@ export default function Home() {
               type="text"
               placeholder="Type something..."
               className="pl-10"
+
+              onChange={(e)=> handleChange(e)}
             />
           </div> 
           <Button variant="outline">Book Now</Button>
         </form>
 
+        {
+          inputValue
+        }
+
+        <div>
+          <h2>History</h2>
+          {
+            history && history.map(i => (
+              <>i</>
+            ))
+          }
+        </div>
         {/* Step 2 */}
         <div className="max-w-md mx-auto mt-10 space-y-4">
           {steps.map((step, index) => (

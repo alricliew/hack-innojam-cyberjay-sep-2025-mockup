@@ -1,32 +1,65 @@
 import { googleAI } from '@genkit-ai/google-genai';
 import { genkit, z } from 'genkit';
 
+export interface LocalBusiness {
+  name: string,
+  url: string,
+  phone: string
+  address: string,
+}
+export const enum Urgency {
+  URGENT = "URGENT",
+  ASAP = "ASAP",
+  TODAY = "TODAY",
+  SCHEDULE = "SCHEDULE",
+}
+export interface JobResult {
+  task : string,
+  skill: string,
+  location_start : string,
+  location_end : string,
+  price : string[],
+  recommended_price : string,
+  urgency : Urgency,
+  datetime : string,
+  local_business: any[]
+}
 const ai = genkit({
   plugins: [googleAI()],
   model: 'googleai/gemini-2.0-flash',
 });
 
-// export const jobFlow = ai.defineFlow(
-//   {
-//     name: 'jobFlow',
-//     inputSchema: z.object({ theme: z.string() }),
-//     outputSchema: z.object({ menuItem: z.string() }),
-//     streamSchema: z.string(),
-//   },
-//   async ({ theme }, { sendChunk }) => {
-//     const { stream, response } = ai.generateStream({
-//       model: googleAI.model('gemini-2.5-flash'),
-//       prompt: `Summarize the task from a user: "${theme}" in to the required format: {type:[send, collect, helper, grocery], urgency: [ASAP, urgent, schedule]}`,
-//     });
+export const jobFlow = ai.defineFlow(
+  {
+    name: 'jobFlow',
+    inputSchema: z.object({ theme: z.string() }),
+    outputSchema: z.object({ jobResult: z.string() }),
+    streamSchema: z.string(),
+  },
+  async ({ theme }, { sendChunk }) => {
+    const { stream, response } = ai.generateStream({
+      model: googleAI.model('gemini-2.5-flash'),
+      prompt: `Summarize the task from a user: "${theme}" in to the required format: {
+        task: "Task reworded properly for processing"
+        skill:Limit it to only [logistic, helper, grocery], 
+        task: "Task reworded properly for processing"
+        location: "get location, else, randomly choose between cyberjaya, kl, shah_alam, petaling_jaya"
+        price: Price info from user
+        recommended_price: Recommended price
+        urgency: [ASAP, urgent, schedule, TODAY]}
+        datetime: Date time
+        local_business: List up to 5 businesses of the same type near me
+      `,
+    });
 
-//     for await (const chunk of stream) {
-//       sendChunk(chunk.text);
-//     }
+    for await (const chunk of stream) {
+      sendChunk(chunk.text);
+    }
 
-//     const { text } = await response;
-//     return { menuItem: text };
-//   }
-// );
+    const { text } = await response;
+    return { jobResult: text };
+  }
+);
 
 export const menuSuggestionFlow = ai.defineFlow(
   {
@@ -47,11 +80,11 @@ export const menuSuggestionFlow = ai.defineFlow(
   //   return output;
   // }
   async ({ theme }, { sendChunk }) => {
-    console.log(`Invent a menu item for a ${theme} themed restaurant.`)
+    console.log("theme", theme)
     const { stream, response } = ai.generateStream({
       model: googleAI.model('gemini-2.5-flash'),
-      prompt: `Findv allvpet groomers in Cyberjaya.`,
-      // prompt: `Invent a menu item for a ${theme} themed restaurant.`,
+      // prompt: `Findv allvpet groomers in Cyberjaya.`,
+      prompt: `Invent a menu item for a ${theme} themed restaurant.`,
       // prompt: `What shoud a men wear to hackathon. Limit to 60 words`,
       // prompt: `Suggest a route form setiawangsa to cyberya avoiding toll and traffic at the same. Limit to 60 words`,
       // prompt: `Find a 1 house for rent in cyberjaya that match my salary of RM3000. I have Rm2000 commitment. Show me the property name or condo name. Limit to 60 words`,
