@@ -75,7 +75,7 @@ export default function LoginPage() {
           <CardDescription>
             Enter your email below to login to your account
             <br />
-            <span>Use client@gmail.com, password: 1234</span>
+            <span>Use client1@gmail.com, password: 123456</span>
           </CardDescription>
         </CardHeader>
         <CardContent>

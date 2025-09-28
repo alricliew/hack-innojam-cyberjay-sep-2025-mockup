@@ -1,5 +1,6 @@
 "use client"
 import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button"
 
 export type WorkerType = {
   name: string;
@@ -186,23 +187,21 @@ export function WorkerCard({ jobResult }: WorkerCardProps) {
 
             {/* Submit Offer Button */}
             <div className="flex justify-end mt-4">
-              <button
-                className={`px-4 py-2 rounded-md text-white ${
+              <Button variant="default" className={`px-4 py-2 mx-2 rounded-md text-white ${
                   isSubmitting
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-green-500 hover:bg-green-600"
                 }`}
-                onClick={handleSubmitOffer}
-                disabled={isSubmitting}
-              >
+                onClick={handleSubmitOffer}>
                 {isSubmitting ? "Submitting..." : "Submit Offer"}
-              </button>
-              <button
-                className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                onClick={() => setSelectedWorker(null)}
-              >
+              </Button>
+
+          
+              <Button variant="default" className="rounded-md" 
+              onClick={() => setSelectedWorker(null)}>
                 Close
-              </button>
+              </Button>
+   
             </div>
           </div>
         </div>

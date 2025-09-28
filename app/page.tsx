@@ -208,7 +208,7 @@ export default function Home() {
                 <Textarea 
                   // type="text"
                   rows={3}
-                  placeholder="Type something..."
+                  placeholder="I want someone to fix my broken pipe in cyberjaya my budget is rm 50 , i need this to he done asap"
                   className="w-full px-4 py-3 text-lg rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm"
                   value={inputValue}
                   onChange={(e)=> handleChange(e)}
@@ -373,10 +373,25 @@ export default function Home() {
         )}
 
         {jobResult && (
-          <div className="flex items-center">
-            <h3>LLM Output:</h3>
-            <p>{JSON.stringify(jobResult)}</p>
+
+          <div className="bg-gray-900 text-white p-4 rounded-md shadow-md w-full max-w-3xl mx-auto">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-lg font-semibold">{"GenAI Output"}</h2>
+              {/* <button
+                onClick={handleCopy}
+                className="text-sm px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded transition"
+              >
+                {copied ? 'Copied!' : 'Copy'}
+              </button> */}
+            </div>
+            <pre className="overflow-auto max-h-[500px] text-sm bg-gray-800 p-3 rounded">
+              <code>{JSON.stringify(jobResult, null, 2)}</code>
+            </pre>
           </div>
+          // <div className="flex items-center">
+          //   <h3>LLM Output:</h3>
+          //   <p>{JSON.stringify(jobResult)}</p>
+          // </div>
         )} 
 
       </main>

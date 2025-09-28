@@ -15,14 +15,19 @@ export default function Header() {
         {/* Logo on the left */}
         <Link href="/">
           <div className="text-xl font-bold">
-            247Runner
+             <span className="bg-black text-white px-2 py-1 rounded">247</span>
+            <span className="ml-1 text-black">Runner</span>
           </div>
         </Link>
 
 
         {/* Right side: Switch + Login button */}
         <div className="flex items-center space-x-4">
-            
+          <Link href="/provider">
+            <div className="text-xl font-bold">
+              Task (Runner Page)
+            </div>
+          </Link>
             {/* <Switch
               color=""
               checked={isChecked}
